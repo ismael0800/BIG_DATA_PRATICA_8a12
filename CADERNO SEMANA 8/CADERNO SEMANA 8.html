@@ -1,0 +1,349 @@
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Big Data · Semana 8 · Apoio à Prática Spark</title><style>
+:root{
+  --bg:#06131b;--bg2:#02080d;--panel:#0c202a;--panel2:#102a35;
+  --line:#1f4b5b;--text:#f1fbff;--muted:#bed4dc;--cyan:#67e8f9;
+  --green:#4ade80;--amber:#fbbf24;--red:#fb7185;--violet:#c4b5fd;--code:#041015;
+}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:linear-gradient(135deg,var(--bg),var(--bg2));color:var(--text);font-family:Arial,Segoe UI,sans-serif;line-height:1.48}
+.top{position:sticky;top:0;z-index:20;background:rgba(2,8,13,.96);border-bottom:1px solid var(--line);padding:10px 14px;display:flex;gap:7px;flex-wrap:wrap}
+.top a{color:white;text-decoration:none;border:1px solid var(--line);padding:7px 9px;border-radius:9px;font-size:12px;font-weight:800}
+.top a:hover{background:#123441}.wrap{max-width:1180px;margin:auto;padding:25px 18px 80px}
+.hero,.section{border:1px solid var(--line);background:rgba(12,32,42,.92);border-radius:20px;padding:20px;margin:18px 0;scroll-margin-top:75px}
+.hero{padding:30px 24px}.kicker{color:var(--cyan);font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:.12em}
+h1{font-size:40px;line-height:1.05;margin:8px 0 12px}h2{font-size:29px;margin:2px 0 9px}h3{font-size:20px;margin:0 0 7px}
+.lead{font-size:18px;max-width:1000px}.grid{display:grid;gap:13px}.g2{grid-template-columns:1fr 1fr}.g3{grid-template-columns:repeat(3,1fr)}
+.card{border:1px solid var(--line);background:rgba(255,255,255,.035);border-radius:15px;padding:14px}.green{border-color:rgba(74,222,128,.35)}.cyan{border-color:rgba(103,232,249,.35)}.amber{border-color:rgba(251,191,36,.35)}.red{border-color:rgba(251,113,133,.35)}
+.call{border:1px solid rgba(103,232,249,.35);background:rgba(103,232,249,.07);padding:12px 14px;border-radius:14px;margin:12px 0}.call.green{border-color:rgba(74,222,128,.35);background:rgba(74,222,128,.07)}.call.amber{border-color:rgba(251,191,36,.35);background:rgba(251,191,36,.07)}.call.red{border-color:rgba(251,113,133,.35);background:rgba(251,113,133,.07)}
+.steps{counter-reset:s;display:grid;gap:8px}.step{position:relative;padding:10px 12px 10px 46px;border:1px solid var(--line);border-radius:12px;background:rgba(255,255,255,.03)}.step:before{counter-increment:s;content:counter(s);position:absolute;left:11px;top:9px;width:24px;height:24px;border-radius:50%;display:grid;place-items:center;background:rgba(103,232,249,.15);color:var(--cyan);font-weight:900}
+.codewrap{position:relative;margin:10px 0}.ctitle{position:absolute;left:12px;top:9px;color:var(--cyan);font-size:11px;font-weight:900;z-index:2}.copy{position:absolute;right:8px;top:7px;z-index:2;border:1px solid var(--line);background:#0b2630;color:white;border-radius:8px;padding:6px 9px;font-weight:900;cursor:pointer}
+pre{white-space:pre-wrap;background:var(--code);border:1px solid #17404e;border-radius:13px;padding:36px 14px 13px;max-height:510px;overflow:auto;font:12.3px/1.46 Consolas,monospace;color:#e8fbff}
+table{width:100%;border-collapse:separate;border-spacing:0 7px;font-size:14px}th{text-align:left;color:var(--cyan);font-size:12px}td{background:rgba(255,255,255,.05);padding:9px;vertical-align:top}
+.badge{display:inline-block;border:1px solid rgba(103,232,249,.28);background:rgba(103,232,249,.08);padding:5px 8px;border-radius:999px;font-size:11px;font-weight:900;text-transform:uppercase}
+.check{display:flex;gap:8px;align-items:flex-start;padding:8px 10px;border:1px solid var(--line);border-radius:11px;margin:6px 0;background:rgba(255,255,255,.025)}
+.check input{margin-top:4px}.small{font-size:13px;color:var(--muted)}
+@media(max-width:850px){.g2,.g3{grid-template-columns:1fr}h1{font-size:33px}.wrap{padding:15px 10px 70px}}
+</style></head><body>
+<nav class="top">
+<a href="#inicio">Início</a><a href="#tempo">100 min</a><a href="#ambiente">Ambiente</a><a href="#teste">1. SparkSession</a><a href="#explorar">2. Explorar</a><a href="#silver">3. Silver</a><a href="#gold">4. Gold</a><a href="#sql">5. SQL</a><a href="#parquet">6. Parquet</a><a href="#evidencias">Evidências</a><a href="#erros">Erros</a>
+</nav>
+<main class="wrap">
+<section id="inicio" class="hero">
+<div class="kicker">Big Data · Semana 08 · Apache Spark</div>
+<h1>Guia de apoio à prática · CSV → DataFrame → Silver → Gold → Parquet</h1>
+<p class="lead">Este guia acompanha as páginas práticas do caderno. Ele diz <b>onde executar</b>, <b>qual arquivo usar</b>, <b>o que deve aparecer</b>, <b>o que guardar como evidência</b> e <b>como continuar quando algo der errado</b>.</p>
+<div class="call green"><b>Caminho recomendado:</b> use o <b>Google Colab</b> se a máquina ainda não tiver PySpark/Java configurados. Se o PySpark já funciona no VS Code, pode permanecer no VS Code. <b>Escolha um caminho e siga nele até o fim.</b></div>
+<div class="call amber"><b>Correção importante:</b> a contagem de nulos deve usar <code>count(when(col(c).isNull(), 1))</code>. Este apoio já traz o código corrigido.</div>
+</section>
+
+<section id="tempo" class="section">
+<span class="badge">Organização</span><h2>Dá para fazer em duas aulas?</h2>
+<div class="call green"><b>Sim, 100 minutos são suficientes</b> se o dataset já estiver disponível e a turma usar Colab ou uma instalação de PySpark já funcionando.</div>
+<table><tr><th>Tempo</th><th>Etapa</th><th>Resultado esperado</th></tr>
+<tr><td>0–10 min</td><td>Preparar ambiente + abrir dataset</td><td>PySpark importando sem erro.</td></tr>
+<tr><td>10–20 min</td><td>SparkSession</td><td>Versão do Spark e <code>local[*]</code>.</td></tr>
+<tr><td>20–35 min</td><td>Carregar e explorar CSV</td><td>Schema, amostra, describe e nulos.</td></tr>
+<tr><td>35–50 min</td><td>Raw → Silver</td><td>Dados limpos e novas colunas.</td></tr>
+<tr><td>50–65 min</td><td>Silver → Gold</td><td>Receita, pedidos e ticket médio.</td></tr>
+<tr><td>65–78 min</td><td>Spark SQL</td><td>Mesmo tipo de resultado via SQL.</td></tr>
+<tr><td>78–90 min</td><td>Salvar e reler Parquet</td><td>Pastas <code>output/</code> criadas e leitura confirmada.</td></tr>
+<tr><td>90–100 min</td><td>Preencher evidências</td><td>Caderno completo e conferido.</td></tr></table>
+<div class="call red"><b>Se a turma começar instalando Java do zero em várias máquinas, 100 minutos podem não bastar.</b> Nesse caso, migre imediatamente os alunos com problema para Colab.</div>
+</section>
+
+<section id="ambiente" class="section">
+<span class="badge">Passo 0</span><h2>Escolha o ambiente antes de começar</h2>
+<div class="grid g2">
+<div class="card cyan"><h3>Caminho A · Google Colab</h3>
+<p>Mais seguro para a aula. Execute cada bloco deste guia em uma célula.</p>
+<div class="codewrap"><div class="ctitle">Primeira célula no Colab</div><button class="copy" onclick="copyCode(this)">Copiar</button><pre>!pip -q install pyspark
+
+from google.colab import files
+uploaded = files.upload()  # selecione vendas_2024.csv
+
+import os
+print(os.listdir())</pre></div>
+<p class="small">Depois do upload, confirme que <code>vendas_2024.csv</code> aparece na lista.</p></div>
+<div class="card green"><h3>Caminho B · VS Code</h3>
+<p>Use somente se Python/PySpark já estiverem funcionando.</p>
+<div class="codewrap"><div class="ctitle">Terminal do VS Code</div><button class="copy" onclick="copyCode(this)">Copiar</button><pre>python -m venv .venv\n\n# PowerShell\n.venv\\Scripts\\Activate.ps1\n\npip install pyspark pandas</pre></div>
+<p>Coloque estes arquivos na <b>mesma pasta</b>:</p>
+<pre style="padding-top:14px">projeto_spark/
+├── vendas_2024.csv
+├── 01_spark_session.py
+└── 07_pipeline_completo_corrigido.py</pre></div>
+</div>
+</section>
+
+<section id="teste" class="section">
+<span class="badge">Página 9 do caderno</span><h2>1 · SparkSession: primeiro teste</h2>
+<p><b>Objetivo:</b> provar que o Spark está funcionando antes de mexer no dataset.</p>
+<div class="steps"><div class="step">Execute o código abaixo.</div><div class="step">Espere aparecer a versão do Spark.</div><div class="step">Confira se o modo mostra <code>local[*]</code>.</div></div>
+<div class="codewrap"><div class="ctitle">SparkSession</div><button class="copy" onclick="copyCode(this)">Copiar</button><pre>from pyspark.sql import SparkSession
+
+spark = (
+    SparkSession.builder
+    .appName(&quot;Semana08Spark&quot;)
+    .master(&quot;local[*]&quot;)
+    .config(&quot;spark.sql.shuffle.partitions&quot;, &quot;8&quot;)
+    .getOrCreate()
+)
+
+print(&quot;Versão do Spark:&quot;, spark.version)
+print(&quot;Modo de execução:&quot;, spark.sparkContext.master)</pre></div>
+<div class="grid g2"><div class="card green"><h3>O que guardar</h3><p>Copie as duas linhas com versão e modo de execução.</p></div><div class="card cyan"><h3>O que significa local[*]?</h3><p>Execução local usando os núcleos disponíveis da máquina. Não é um cluster remoto.</p></div></div>
+<div class="call red"><b>Se este passo falhar, não avance.</b> Resolva o ambiente primeiro ou vá para Colab.</div>
+</section>
+
+<section id="explorar" class="section">
+<span class="badge">Páginas 10–12</span><h2>2 · Carregar e explorar o CSV</h2>
+<p><b>Objetivo:</b> transformar o arquivo em um DataFrame e entender sua estrutura antes de limpar.</p>
+<div class="codewrap"><div class="ctitle">Carregar + explorar</div><button class="copy" onclick="copyCode(this)">Copiar</button><pre>from pyspark.sql import SparkSession
+from pyspark.sql.functions import col, count, when
+
+spark = (
+    SparkSession.builder
+    .appName(&quot;Semana08Spark&quot;)
+    .master(&quot;local[*]&quot;)
+    .config(&quot;spark.sql.shuffle.partitions&quot;, &quot;8&quot;)
+    .getOrCreate()
+)
+
+# O CSV usa ; como separador.
+df = (
+    spark.read
+    .option(&quot;header&quot;, &quot;true&quot;)
+    .option(&quot;inferSchema&quot;, &quot;true&quot;)
+    .option(&quot;sep&quot;, &quot;;&quot;)
+    .option(&quot;encoding&quot;, &quot;UTF-8&quot;)
+    .csv(&quot;vendas_2024.csv&quot;)
+)
+
+print(&quot;=== TAMANHO ===&quot;)
+print(&quot;Linhas:&quot;, df.count())
+print(&quot;Colunas:&quot;, len(df.columns))
+
+print(&quot;=== SCHEMA ===&quot;)
+df.printSchema()
+
+print(&quot;=== AMOSTRA ===&quot;)
+df.show(5, truncate=False)
+
+print(&quot;=== ESTATÍSTICAS ===&quot;)
+df.describe([&quot;total&quot;, &quot;quantidade&quot;, &quot;shipping&quot;, &quot;discount&quot;]).show()
+
+print(&quot;=== NULOS POR COLUNA ===&quot;)
+# CORREÇÃO IMPORTANTE:
+# count(when(col(c).isNull(), 1)) conta 1 quando o valor é nulo.
+df.select([
+    count(when(col(c).isNull(), 1)).alias(c)
+    for c in df.columns
+]).show()</pre></div>
+<div class="steps">
+<div class="step"><code>df.count()</code> é uma <b>action</b>: dispara a execução.</div>
+<div class="step"><code>printSchema()</code> mostra nomes e tipos das colunas.</div>
+<div class="step"><code>show(5)</code> mostra somente uma amostra; não traz todo o dataset para o driver.</div>
+<div class="step"><code>describe()</code> resume algumas colunas numéricas.</div>
+<div class="step">A tabela de nulos deve permitir perceber se alguma coluna precisa de tratamento.</div>
+</div>
+<div class="call amber"><b>Se tudo aparecer em uma única coluna:</b> o separador está errado. Este CSV usa <code>;</code>, então mantenha <code>.option("sep", ";")</code>.</div>
+</section>
+
+<section id="silver" class="section">
+<span class="badge">Transformação principal</span><h2>3 · Raw → Silver, linha por linha</h2>
+<p><b>Silver</b> representa a versão limpa e confiável dos dados. Aqui cada operação tem um motivo.</p>
+<div class="codewrap"><div class="ctitle">Criar df_silver</div><button class="copy" onclick="copyCode(this)">Copiar</button><pre>from pyspark.sql.functions import col, to_date, year, month, when
+
+# Partimos do DataFrame df já carregado.
+df_silver = (
+    df
+
+    # Remove order_id repetido.
+    .dropDuplicates([&quot;order_id&quot;])
+
+    # Remove registros sem campos essenciais.
+    .dropna(subset=[&quot;order_id&quot;, &quot;total&quot;, &quot;order_date&quot;])
+
+    # Garante tipos numéricos.
+    .withColumn(&quot;total&quot;, col(&quot;total&quot;).cast(&quot;double&quot;))
+    .withColumn(&quot;shipping&quot;, col(&quot;shipping&quot;).cast(&quot;double&quot;))
+    .withColumn(&quot;discount&quot;, col(&quot;discount&quot;).cast(&quot;double&quot;))
+
+    # Converte a data de texto para data real.
+    .withColumn(&quot;order_date&quot;, to_date(col(&quot;order_date&quot;), &quot;dd/MM/yyyy&quot;))
+
+    # Cria colunas úteis para análise.
+    .withColumn(&quot;ano&quot;, year(&quot;order_date&quot;))
+    .withColumn(&quot;mes&quot;, month(&quot;order_date&quot;))
+
+    # Mantém apenas pedidos pagos e com valor positivo.
+    .filter((col(&quot;total&quot;) &gt; 0) &amp; (col(&quot;status&quot;) == &quot;paid&quot;))
+
+    # Substitui nulos de frete/desconto por zero.
+    .fillna({&quot;shipping&quot;: 0.0, &quot;discount&quot;: 0.0})
+
+    # Nova coluna: valor + frete.
+    .withColumn(&quot;total_com_frete&quot;, col(&quot;total&quot;) + col(&quot;shipping&quot;))
+
+    # Classificação didática por faixa.
+    .withColumn(
+        &quot;faixa_valor&quot;,
+        when(col(&quot;total&quot;) &lt; 100, &quot;baixo&quot;)
+        .when(col(&quot;total&quot;) &lt;= 500, &quot;medio&quot;)
+        .otherwise(&quot;alto&quot;)
+    )
+)
+
+print(&quot;=== SILVER ===&quot;)
+print(&quot;Linhas após limpeza:&quot;, df_silver.count())
+df_silver.show(10, truncate=False)
+df_silver.printSchema()</pre></div>
+<table><tr><th>Operação</th><th>Por que existe?</th></tr>
+<tr><td><code>dropDuplicates(["order_id"])</code></td><td>Um pedido não deve aparecer duas vezes.</td></tr>
+<tr><td><code>dropna(...)</code></td><td>Remove registros sem campos essenciais.</td></tr>
+<tr><td><code>cast("double")</code></td><td>Garante que valores monetários sejam numéricos.</td></tr>
+<tr><td><code>to_date()</code></td><td>Transforma texto em data real.</td></tr>
+<tr><td><code>year()</code> / <code>month()</code></td><td>Cria colunas para análises e particionamento.</td></tr>
+<tr><td><code>filter()</code></td><td>Mantém pedidos pagos e com valor válido.</td></tr>
+<tr><td><code>fillna()</code></td><td>Troca nulos de frete/desconto por zero.</td></tr>
+<tr><td><code>withColumn()</code></td><td>Cria dados derivados.</td></tr></table>
+<div class="call green"><b>Checkpoint:</b> depois da limpeza, o número de linhas deve ser <b>menor</b> que o número original. Se ficar zero, há algo errado no filtro, tipos ou leitura.</div>
+</section>
+
+<section id="gold" class="section">
+<span class="badge">Agregação</span><h2>4 · Silver → Gold com DataFrame API</h2>
+<p><b>Gold</b> é o dado resumido e pronto para relatório/análise.</p>
+<div class="codewrap"><div class="ctitle">Criar df_gold</div><button class="copy" onclick="copyCode(this)">Copiar</button><pre>from pyspark.sql.functions import sum, count, avg, round, col
+
+df_gold = (
+    df_silver
+    .groupBy(&quot;ano&quot;, &quot;mes&quot;, &quot;category&quot;)
+    .agg(
+        round(sum(&quot;total&quot;), 2).alias(&quot;receita&quot;),
+        count(&quot;order_id&quot;).alias(&quot;pedidos&quot;),
+        round(avg(&quot;total&quot;), 2).alias(&quot;ticket_medio&quot;)
+    )
+    .orderBy(&quot;ano&quot;, &quot;mes&quot;, col(&quot;receita&quot;).desc())
+)
+
+print(&quot;=== GOLD - DATAFRAME API ===&quot;)
+df_gold.show(20, truncate=False)</pre></div>
+<div class="grid g3">
+<div class="card cyan"><h3>Receita</h3><p>Soma do <code>total</code>.</p></div>
+<div class="card green"><h3>Pedidos</h3><p>Quantidade de <code>order_id</code>.</p></div>
+<div class="card amber"><h3>Ticket médio</h3><p>Média do valor dos pedidos.</p></div></div>
+<div class="call"><b>Evidência:</b> copie a saída do <code>df_gold.show(20)</code>. Não é necessário usar <code>collect()</code>.</div>
+</section>
+
+<section id="sql" class="section">
+<span class="badge">Comparação</span><h2>5 · Fazer a mesma análise com Spark SQL</h2>
+<p>A view temporária permite consultar o DataFrame com SQL tradicional.</p>
+<div class="codewrap"><div class="ctitle">Spark SQL</div><button class="copy" onclick="copyCode(this)">Copiar</button><pre># Registra o DataFrame Silver como uma tabela temporária.
+df_silver.createOrReplaceTempView(&quot;vendas_silver&quot;)
+
+sql_gold = spark.sql(&quot;&quot;&quot;
+    SELECT
+        ano,
+        mes,
+        category,
+        ROUND(SUM(total), 2) AS receita,
+        COUNT(order_id) AS pedidos,
+        ROUND(AVG(total), 2) AS ticket_medio
+    FROM vendas_silver
+    GROUP BY ano, mes, category
+    ORDER BY ano, mes, receita DESC
+&quot;&quot;&quot;)
+
+print(&quot;=== GOLD - SPARK SQL ===&quot;)
+sql_gold.show(20, truncate=False)</pre></div>
+<div class="call green"><b>O que observar:</b> DataFrame API e Spark SQL devem produzir a mesma lógica de agregação. A sintaxe muda; o objetivo da análise não.</div>
+</section>
+
+<section id="parquet" class="section">
+<span class="badge">Saída</span><h2>6 · Salvar e verificar Parquet</h2>
+<p>Não basta o comando terminar sem erro. A prática precisa provar que os arquivos podem ser lidos novamente.</p>
+<div class="codewrap"><div class="ctitle">Salvar + reler</div><button class="copy" onclick="copyCode(this)">Copiar</button><pre># Salva Silver particionada por ano e mês.
+(
+    df_silver.write
+    .mode(&quot;overwrite&quot;)
+    .partitionBy(&quot;ano&quot;, &quot;mes&quot;)
+    .parquet(&quot;output/silver/vendas&quot;)
+)
+
+# Salva Gold.
+(
+    df_gold.write
+    .mode(&quot;overwrite&quot;)
+    .parquet(&quot;output/gold/receita_mensal&quot;)
+)
+
+print(&quot;Parquet salvo.&quot;)
+
+# VERIFICAÇÃO: ler de volta é a melhor prova de que funcionou.
+silver_lido = spark.read.parquet(&quot;output/silver/vendas&quot;)
+gold_lido = spark.read.parquet(&quot;output/gold/receita_mensal&quot;)
+
+print(&quot;=== VERIFICAÇÃO SILVER ===&quot;)
+print(&quot;Linhas lidas do Parquet:&quot;, silver_lido.count())
+silver_lido.printSchema()
+
+print(&quot;=== VERIFICAÇÃO GOLD ===&quot;)
+gold_lido.show(5, truncate=False)</pre></div>
+<div class="call amber"><b>Parquet gera pastas, não um único arquivo.</b> Dentro delas haverá arquivos <code>part-...</code> e metadados. Isso é normal no Spark.</div>
+<div class="call green"><b>Sucesso completo:</b> se o Spark consegue ler de volta <code>output/silver/vendas</code> e <code>output/gold/receita_mensal</code>, a escrita funcionou.</div>
+</section>
+
+<section id="evidencias" class="section">
+<span class="badge">Página 12 do caderno</span><h2>O que exatamente colar nas evidências?</h2>
+<table><tr><th>Campo do caderno</th><th>De onde copiar</th><th>O que deve conter</th></tr>
+<tr><td><code>printSchema()</code></td><td>Saída da etapa 2</td><td>Árvore com colunas e tipos.</td></tr>
+<tr><td><code>describe()</code></td><td>Saída da etapa 2</td><td>count, mean, stddev, min, max.</td></tr>
+<tr><td>Tabela de nulos</td><td>Saída da etapa 2</td><td>Uma coluna de contagem para cada campo.</td></tr>
+<tr><td>Linhas do Silver</td><td><code>df_silver.count()</code></td><td>Número depois da limpeza.</td></tr>
+<tr><td><code>df_gold.show(20)</code></td><td>Saída da etapa 4</td><td>ano, mês, categoria, receita, pedidos, ticket.</td></tr>
+<tr><td>Pastas do output</td><td>Etapa 6</td><td><code>output/silver/vendas</code> e <code>output/gold/receita_mensal</code>.</td></tr></table>
+<div class="call cyan"><b>Regra:</b> evidência é a saída real da sua execução. Não copie o exemplo de outro aluno.</div>
+</section>
+
+<section id="erros" class="section">
+<span class="badge">Diagnóstico</span><h2>Se der erro, procure nesta ordem</h2>
+<table><tr><th>Sintoma</th><th>Causa provável</th><th>Correção</th></tr>
+<tr><td><code>ModuleNotFoundError: pyspark</code></td><td>PySpark não instalado</td><td><code>pip install pyspark</code> ou use Colab.</td></tr>
+<tr><td>Erro de Java / gateway</td><td>Java local ausente/incompatível</td><td>Para não perder a aula, use Colab.</td></tr>
+<tr><td><code>PATH_NOT_FOUND</code> / arquivo não encontrado</td><td>CSV fora da pasta de execução</td><td>Coloque o CSV junto do script ou informe o caminho correto.</td></tr>
+<tr><td>Uma única coluna</td><td>Separador errado</td><td>Use <code>sep=";"</code>.</td></tr>
+<tr><td>Tabela de nulos mostra zero para tudo</td><td>Código antigo de contagem</td><td>Use <code>count(when(col(c).isNull(), 1))</code>.</td></tr>
+<tr><td>Silver fica com zero linhas</td><td>Filtro/tipos/data incorretos</td><td>Execute <code>df.printSchema()</code> e <code>df.select("status","total").show()</code>.</td></tr>
+<tr><td>Não aparece pasta Parquet</td><td>Execução não chegou ao write ou caminho diferente</td><td>Rode somente a etapa 6 e leia de volta o caminho.</td></tr>
+<tr><td>Processo pesado/travando</td><td>Uso de <code>collect()</code> ou muitas partições</td><td>Use <code>show()</code> e mantenha shuffle partitions em 8.</td></tr></table>
+<div class="call red"><b>Não apague tudo e recomece no primeiro erro.</b> Rode as etapas separadas e descubra exatamente em qual checkpoint parou.</div>
+</section>
+
+<section class="section">
+<h2>Checklist final antes de preencher o caderno</h2>
+<label class="check"><input type="checkbox"> SparkSession abriu e mostrou a versão.</label>
+<label class="check"><input type="checkbox"> CSV carregou com várias colunas.</label>
+<label class="check"><input type="checkbox"> Schema foi exibido.</label>
+<label class="check"><input type="checkbox"> Nulos foram contados com o código corrigido.</label>
+<label class="check"><input type="checkbox"> Silver ficou com linhas e novas colunas.</label>
+<label class="check"><input type="checkbox"> Gold mostrou receita, pedidos e ticket médio.</label>
+<label class="check"><input type="checkbox"> Spark SQL executou.</label>
+<label class="check"><input type="checkbox"> Parquet foi salvo e relido.</label>
+<label class="check"><input type="checkbox"> Evidências foram copiadas para o caderno.</label>
+<div class="call green"><b>Se todos os itens acima estiverem marcados, a prática está completa.</b></div>
+</section>
+</main>
+<script>
+function copyCode(btn){
+  const t=btn.parentElement.querySelector("pre").innerText;
+  navigator.clipboard.writeText(t).then(()=>{
+    const old=btn.textContent; btn.textContent="Copiado ✓";
+    setTimeout(()=>btn.textContent=old,900);
+  });
+}
+document.querySelectorAll('.check input').forEach((el,i)=>{
+  const k='spark8_apoio_'+i;
+  el.checked=localStorage.getItem(k)==='1';
+  el.addEventListener('change',()=>localStorage.setItem(k,el.checked?'1':'0'));
+});
+</script></body></html>

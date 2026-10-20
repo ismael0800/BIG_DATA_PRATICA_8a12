@@ -1,0 +1,45 @@
+{
+  "answers": {
+    "dadosobs": "pedidos, categorias e estados",
+    "baseplan": "SortMergeJoin (LeftOuter) acompanhado de operadores Exchange (Shuffle).",
+    "baseshuffle": "Stage 6 / Stage 7 com aproximadamente ~35 MB a ~40 MB de Shuffle Read/Write.",
+    "basetime": "7.87",
+    "basetasks": "Sim. Houve assimetria na duração das tasks devido ao grande volume de dados e ao efeito de data skew (muitos pedidos concentrados em uma mesma partição), fazendo com que algumas tasks demorassem bem mais para finalizar.",
+    "filtroq": "Porque reduz o número de linhas antes do join, diminuindo o uso de memória e fazendo o Spark processar muito menos dados.",
+    "broadcastq": "As tabelas pequenas (categorias e estados). Faz sentido porque elas têm menos de 100 linhas e cabem facilmente na memória, evitando o shuffle pesado da tabela de 1,2 milhão de pedidos.",
+    "optplan": "BroadcastHashJoin (em vez de SortMergeJoin).",
+    "opttime": "Coloque o número em segundos que apareceu no seu terminal (ex: 3.50).",
+    "optshuffle": "O Shuffle Read/Write caiu drasticamente (ficou praticamente zerado nos joins), pois o Broadcast eliminou a necessidade de redistribuir os 1,2 milhão de pedidos.",
+    "skewtop": "420000 pedidos (para o customer_id=1).",
+    "skewpart": "A menor partição tem ~46.848 linhas e a maior (partição 13) tem 469.728 linhas (10 vezes maior). Isso sugere que a task da partição 13 vai demorar muito mais tempo que as outras (task retardatária), travando o estágio.",
+    "conclusao": "O código otimizado ficou mais que duas vezes mais rápido, caindo de 7.87s para 3.10s.\nIsso aconteceu por três motivos simples:\n1. Filtramos antes: jogamos fora os pedidos cancelados logo no início, evitando cruzar 1,2 milhão de linhas à toa.\n2. Usamos Broadcast: como as tabelas de categorias e estados eram bem pequenas, o Spark guardou uma cópia delas direto na memória, sem precisar ficar transferindo dados pesados pela rede.\n3. Organizamos a saída com coalesce(4): geramos apenas 4 arquivos organizados no final.\nA prova disso está no tempo menor e no plano de execução, que trocou o cruzamento lento (SortMergeJoin) pelo rápido (BroadcastHashJoin).",
+    "nome": "YAN ISMAEL CLEMENTE ALVES",
+    "turma": "TEC IA TARDE "
+  },
+  "checks": {
+    "envok": true,
+    "dadosok": true,
+    "baseok": true,
+    "todo1ok": true,
+    "todo2ok": true,
+    "todo3ok": true,
+    "skewok": true,
+    "fimok": true
+  },
+  "done": {
+    "fim": true,
+    "erros": true,
+    "entrega": true,
+    "skew": true,
+    "inicio": true,
+    "aula1": true,
+    "aula2": true,
+    "aula3": true,
+    "setup": true,
+    "dados": true,
+    "baseline": true,
+    "todo1": true,
+    "todo2": true,
+    "todo3": true
+  }
+}

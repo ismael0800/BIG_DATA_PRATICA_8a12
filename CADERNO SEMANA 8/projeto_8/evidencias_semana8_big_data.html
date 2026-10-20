@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Evidências da Semana 8 - Big Data (Apache Spark)</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-page: #080d1a;
+            --bg-card: #0f172a;
+            --bg-card-header: #131d35;
+            --bg-code: #060a14;
+            --border: #1e293b;
+            --border-hover: #38bdf8;
+            --cyan: #38bdf8;
+            --emerald: #10b981;
+            --amber: #f59e0b;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --text-dim: #64748b;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg-page);
+            color: var(--text-main);
+            line-height: 1.6;
+            padding: 2.5rem 1.25rem;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        /* Top Header */
+        header {
+            margin-bottom: 2rem;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 1.75rem;
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 0.8rem;
+        }
+
+        .badge-main {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(56, 189, 248, 0.12);
+            color: var(--cyan);
+            border: 1px solid rgba(56, 189, 248, 0.3);
+            padding: 0.35rem 0.85rem;
+            border-radius: 9999px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .status-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            background: rgba(16, 185, 129, 0.15);
+            color: #34d399;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            padding: 0.35rem 0.85rem;
+            border-radius: 9999px;
+            font-size: 0.82rem;
+            font-weight: 600;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: var(--emerald);
+            box-shadow: 0 0 8px var(--emerald);
+        }
+
+        h1 {
+            font-size: 2.25rem;
+            font-weight: 800;
+            color: #ffffff;
+            letter-spacing: -0.03em;
+            margin-bottom: 0.4rem;
+        }
+
+        .subtitle {
+            color: var(--text-muted);
+            font-size: 1.05rem;
+        }
+
+        /* Official Caderno Instruction Box */
+        .instruction-box {
+            margin-top: 1.5rem;
+            background: linear-gradient(135deg, rgba(19, 29, 53, 0.8) 0%, rgba(15, 23, 42, 0.95) 100%);
+            border: 1px solid rgba(56, 189, 248, 0.25);
+            border-left: 4px solid var(--cyan);
+            border-radius: 10px;
+            padding: 1.25rem 1.5rem;
+        }
+
+        .instruction-box h4 {
+            color: #ffffff;
+            font-size: 0.95rem;
+            font-weight: 700;
+            margin-bottom: 0.4rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .instruction-box p {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        /* Quick Nav / Table Overview */
+        .nav-table-container {
+            margin: 2rem 0;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .nav-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+            text-align: left;
+        }
+
+        .nav-table th {
+            background: var(--bg-card-header);
+            color: #ffffff;
+            padding: 0.85rem 1.25rem;
+            font-weight: 700;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .nav-table td {
+            padding: 0.85rem 1.25rem;
+            border-bottom: 1px solid rgba(30, 41, 59, 0.6);
+            color: var(--text-muted);
+        }
+
+        .nav-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .nav-table tr:hover td {
+            background: rgba(56, 189, 248, 0.03);
+            color: #ffffff;
+        }
+
+        .nav-table .item-name {
+            color: var(--cyan);
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 600;
+        }
+
+        .nav-table .jump-link {
+            color: #94a3b8;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+            font-weight: 600;
+        }
+
+        .nav-table .jump-link:hover {
+            color: var(--cyan);
+        }
+
+        /* Evidences Section */
+        .evidences-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .evidence-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+            transition: all 0.25s ease;
+        }
+
+        .evidence-card:hover {
+            border-color: rgba(56, 189, 248, 0.45);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--bg-card-header);
+            padding: 1.1rem 1.5rem;
+            border-bottom: 1px solid var(--border);
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .card-title-meta {
+            display: flex;
+            align-items: center;
+            gap: 0.85rem;
+            flex-wrap: wrap;
+        }
+
+        .num-badge {
+            background: var(--cyan);
+            color: #080d1a;
+            font-weight: 800;
+            font-size: 0.85rem;
+            padding: 0.2rem 0.65rem;
+            border-radius: 6px;
+        }
+
+        .card-title {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: #ffffff;
+        }
+
+        .origin-badge {
+            background: rgba(148, 163, 184, 0.1);
+            color: var(--text-muted);
+            border: 1px solid rgba(148, 163, 184, 0.2);
+            font-size: 0.78rem;
+            padding: 0.2rem 0.55rem;
+            border-radius: 4px;
+        }
+
+        .card-desc {
+            font-size: 0.88rem;
+            color: var(--text-muted);
+            margin-top: 0.25rem;
+        }
+
+        .btn-copy {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(56, 189, 248, 0.12);
+            color: var(--cyan);
+            border: 1px solid rgba(56, 189, 248, 0.35);
+            padding: 0.55rem 1.25rem;
+            border-radius: 8px;
+            font-size: 0.88rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            user-select: none;
+        }
+
+        .btn-copy:hover {
+            background: var(--cyan);
+            color: #080d1a;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(56, 189, 248, 0.25);
+        }
+
+        .btn-copy.copied {
+            background: var(--emerald);
+            color: #ffffff;
+            border-color: var(--emerald);
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+        }
+
+        .code-box {
+            background: var(--bg-code);
+            padding: 1.25rem 1.5rem;
+            overflow-x: auto;
+        }
+
+        pre {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.88rem;
+            line-height: 1.55;
+            color: #e2e8f0;
+            white-space: pre;
+        }
+
+        /* Toast Feedback Notification */
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: #10b981;
+            color: #ffffff;
+            padding: 0.9rem 1.6rem;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            display: none;
+            z-index: 1000;
+            animation: popUp 0.3s ease;
+        }
+
+        @keyframes popUp {
+            from { transform: translateY(100%); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        footer {
+            margin-top: 3.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--border);
+            text-align: center;
+            color: var(--text-dim);
+            font-size: 0.85rem;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+
+        <!-- Header -->
+        <header>
+            <div class="header-top">
+                <span class="badge-main">PÁGINA 12 DO CADERNO</span>
+                <span class="status-pill"><span class="status-dot"></span> 6 de 6 Evidências Validadas</span>
+            </div>
+            <h1>Evidências da Semana 8 - Big Data</h1>
+            <p class="subtitle">Apache Spark • PySpark • Tratamento de Dados (Bronze, Silver & Gold) • Formato Parquet</p>
+
+            <div class="instruction-box">
+                <h4>📋 O que exatamente colar nas evidências?</h4>
+                <p>Regra oficial do curso: <em>"Evidência é a saída real da sua execução. Não copie o exemplo de outro aluno."</em><br>
+                Todas as 6 evidências abaixo são os resultados reais e exatos da sua máquina local (base de 100.003 linhas). Clique no botão <strong>"Copiar Evidência"</strong> para colar diretamente no seu formulário.</p>
+            </div>
+        </header>
+
+        <!-- Tabela Resumo (Página 12) -->
+        <div class="nav-table-container">
+            <table class="nav-table">
+                <thead>
+                    <tr>
+                        <th>Campo do Caderno</th>
+                        <th>De onde copiar</th>
+                        <th>O que deve conter</th>
+                        <th>Ação Rápida</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="item-name">printSchema()</td>
+                        <td>Saída da etapa 2</td>
+                        <td>Árvore com colunas e tipos</td>
+                        <td><a href="#card-1" class="jump-link">Ver Evidência 1 ↓</a></td>
+                    </tr>
+                    <tr>
+                        <td class="item-name">describe()</td>
+                        <td>Saída da etapa 2</td>
+                        <td>count, mean, stddev, min, max</td>
+                        <td><a href="#card-2" class="jump-link">Ver Evidência 2 ↓</a></td>
+                    </tr>
+                    <tr>
+                        <td class="item-name">Tabela de nulos</td>
+                        <td>Saída da etapa 2</td>
+                        <td>Uma coluna de contagem para cada campo</td>
+                        <td><a href="#card-3" class="jump-link">Ver Evidência 3 ↓</a></td>
+                    </tr>
+                    <tr>
+                        <td class="item-name">Linhas do Silver</td>
+                        <td>df_silver.count()</td>
+                        <td>Número depois da limpeza</td>
+                        <td><a href="#card-4" class="jump-link">Ver Evidência 4 ↓</a></td>
+                    </tr>
+                    <tr>
+                        <td class="item-name">df_gold.show(20)</td>
+                        <td>Saída da etapa 4</td>
+                        <td>ano, mês, categoria, receita, pedidos, ticket</td>
+                        <td><a href="#card-5" class="jump-link">Ver Evidência 5 ↓</a></td>
+                    </tr>
+                    <tr>
+                        <td class="item-name">Pastas do output</td>
+                        <td>Etapa 6</td>
+                        <td>output/silver/vendas e output/gold/receita_mensal</td>
+                        <td><a href="#card-6" class="jump-link">Ver Evidência 6 ↓</a></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Lista de Evidências com Botões de Cópia -->
+        <div class="evidences-wrapper">
+
+            <!-- EVIDÊNCIA 1: printSchema() -->
+            <div class="evidence-card" id="card-1">
+                <div class="card-header">
+                    <div>
+                        <div class="card-title-meta">
+                            <span class="num-badge">1</span>
+                            <span class="card-title">printSchema()</span>
+                            <span class="origin-badge">Saída da etapa 2</span>
+                        </div>
+                        <div class="card-desc">Árvore estruturada com as 10 colunas e tipos de dados inferidos</div>
+                    </div>
+                    <button class="btn-copy" onclick="copyCode('code-1', this)">Copiar Evidência</button>
+                </div>
+                <div class="code-box">
+<pre id="code-1">root
+ |-- order_id: integer (nullable = true)
+ |-- customer_id: integer (nullable = true)
+ |-- order_date: string (nullable = true)
+ |-- category: string (nullable = true)
+ |-- status: string (nullable = true)
+ |-- state: string (nullable = true)
+ |-- quantidade: integer (nullable = true)
+ |-- total: double (nullable = true)
+ |-- shipping: double (nullable = true)
+ |-- discount: double (nullable = true)</pre>
+                </div>
+            </div>
+
+            <!-- EVIDÊNCIA 2: describe() -->
+            <div class="evidence-card" id="card-2">
+                <div class="card-header">
+                    <div>
+                        <div class="card-title-meta">
+                            <span class="num-badge">2</span>
+                            <span class="card-title">describe()</span>
+                            <span class="origin-badge">Saída da etapa 2</span>
+                        </div>
+                        <div class="card-desc">Tabela de estatísticas com contagem (100.003), médias, desvio, mínimo (-100.0) e máximo</div>
+                    </div>
+                    <button class="btn-copy" onclick="copyCode('code-2', this)">Copiar Evidência</button>
+                </div>
+                <div class="code-box">
+<pre id="code-2">+-------+-----------------+------------------+------------------+------------------+
+|summary|            total|        quantidade|          shipping|          discount|
++-------+-----------------+------------------+------------------+------------------+
+|  count|           100003|            100003|            100002|            100002|
+|   mean|761.8744948651536|3.4986250412487627| 29.94567968640625|15.698708825823472|
+| stddev|427.0480436892321|1.7087735986044152|17.311668513746707|31.771648264584922|
+|    min|           -100.0|                 1|               0.0|               0.0|
+|    max|          1499.99|                 6|              60.0|             120.0|
++-------+-----------------+------------------+------------------+------------------+</pre>
+                </div>
+            </div>
+
+            <!-- EVIDÊNCIA 3: Tabela de Nulos -->
+            <div class="evidence-card" id="card-3">
+                <div class="card-header">
+                    <div>
+                        <div class="card-title-meta">
+                            <span class="num-badge">3</span>
+                            <span class="card-title">Tabela de nulos</span>
+                            <span class="origin-badge">Saída da etapa 2</span>
+                        </div>
+                        <div class="card-desc">Contagem de nulos: detectou 1 em shipping e 1 em discount (demais zerados)</div>
+                    </div>
+                    <button class="btn-copy" onclick="copyCode('code-3', this)">Copiar Evidência</button>
+                </div>
+                <div class="code-box">
+<pre id="code-3">+--------+-----------+----------+--------+------+-----+----------+-----+--------+--------+
+|order_id|customer_id|order_date|category|status|state|quantidade|total|shipping|discount|
++--------+-----------+----------+--------+------+-----+----------+-----+--------+--------+
+|       0|          0|         0|       0|     0|    0|         0|    0|       1|       1|
++--------+-----------+----------+--------+------+-----+----------+-----+--------+--------+</pre>
+                </div>
+            </div>
+
+            <!-- EVIDÊNCIA 4: Linhas do Silver -->
+            <div class="evidence-card" id="card-4">
+                <div class="card-header">
+                    <div>
+                        <div class="card-title-meta">
+                            <span class="num-badge">4</span>
+                            <span class="card-title">Linhas do Silver</span>
+                            <span class="origin-badge">df_silver.count()</span>
+                        </div>
+                        <div class="card-desc">Contagem exata de registros sobreviventes após filtros de qualidade e limpeza</div>
+                    </div>
+                    <button class="btn-copy" onclick="copyCode('code-4', this)">Copiar Evidência</button>
+                </div>
+                <div class="code-box">
+<pre id="code-4">72343</pre>
+                </div>
+            </div>
+
+            <!-- EVIDÊNCIA 5: df_gold.show(20) -->
+            <div class="evidence-card" id="card-5">
+                <div class="card-header">
+                    <div>
+                        <div class="card-title-meta">
+                            <span class="num-badge">5</span>
+                            <span class="card-title">df_gold.show(20)</span>
+                            <span class="origin-badge">Saída da etapa 4</span>
+                        </div>
+                        <div class="card-desc">Tabela final agregada com ano, mês, categoria, receita, pedidos e ticket médio</div>
+                    </div>
+                    <button class="btn-copy" onclick="copyCode('code-5', this)">Copiar Evidência</button>
+                </div>
+                <div class="code-box">
+<pre id="code-5">+----+---+-----------+---------+-------+------------+
+|ano |mes|category   |receita  |pedidos|ticket_medio|
++----+---+-----------+---------+-------+------------+
+|2024|1  |livros     |961295.12|1255   |765.97      |
+|2024|1  |casa       |957353.19|1243   |770.2       |
+|2024|1  |mercado    |951256.77|1275   |746.08      |
+|2024|1  |moda       |944389.65|1217   |776.0       |
+|2024|1  |eletronicos|943087.92|1215   |776.2       |
+|2024|2  |eletronicos|922892.79|1191   |774.89      |
+|2024|2  |moda       |913068.84|1185   |770.52      |
+|2024|2  |mercado    |904568.16|1169   |773.8       |
+|2024|2  |livros     |859177.47|1136   |756.32      |
+|2024|2  |casa       |856311.51|1135   |754.46      |
+|2024|3  |livros     |959832.26|1269   |756.37      |
+|2024|3  |casa       |955334.32|1233   |774.8       |
+|2024|3  |eletronicos|953141.89|1233   |773.03      |
+|2024|3  |mercado    |948271.44|1237   |766.59      |
+|2024|3  |moda       |922904.57|1216   |758.97      |
+|2024|4  |moda       |963091.29|1248   |771.71      |
+|2024|4  |casa       |895971.04|1197   |748.51      |
+|2024|4  |eletronicos|874493.51|1144   |764.42      |
+|2024|4  |mercado    |861864.81|1137   |758.02      |
+|2024|4  |livros     |811821.23|1080   |751.69      |
++----+---+-----------+---------+-------+------------+
+only showing top 20 rows</pre>
+                </div>
+            </div>
+
+            <!-- EVIDÊNCIA 6: Pastas do output -->
+            <div class="evidence-card" id="card-6">
+                <div class="card-header">
+                    <div>
+                        <div class="card-title-meta">
+                            <span class="num-badge">6</span>
+                            <span class="card-title">Pastas do output</span>
+                            <span class="origin-badge">Etapa 6</span>
+                        </div>
+                        <div class="card-desc">Caminhos gravados com sucesso contendo os arquivos Parquet das camadas Silver e Gold</div>
+                    </div>
+                    <button class="btn-copy" onclick="copyCode('code-6', this)">Copiar Evidência</button>
+                </div>
+                <div class="code-box">
+<pre id="code-6">output/silver/vendas
+output/gold/receita_mensal</pre>
+                </div>
+            </div>
+
+        </div>
+
+        <footer>
+            Semana 8 • Big Data • Apache Spark 4.2.0 • OpenJDK 17 • Evidências Reais de Execução
+        </footer>
+
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast">✓ Evidência copiada com sucesso!</div>
+
+    <script>
+        function copyCode(elementId, btn) {
+            const pre = document.getElementById(elementId);
+            const text = pre.innerText;
+
+            navigator.clipboard.writeText(text).then(() => {
+                const originalText = btn.innerText;
+                btn.innerText = "✓ Copiado!";
+                btn.classList.add("copied");
+
+                const toast = document.getElementById("toast");
+                toast.style.display = "block";
+
+                setTimeout(() => {
+                    btn.innerText = originalText;
+                    btn.classList.remove("copied");
+                    toast.style.display = "none";
+                }, 2000);
+            }).catch(err => {
+                console.error("Erro ao copiar:", err);
+            });
+        }
+    </script>
+</body>
+</html>

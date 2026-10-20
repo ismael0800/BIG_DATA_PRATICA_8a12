@@ -1,0 +1,14 @@
+{
+  "sem_cache": {
+    "top_produtos": 3.736,
+    "por_mes": 1.143,
+    "por_regiao": 0.898
+  },
+  "materializacao": 1.68,
+  "com_cache": {
+    "top_produtos": 0.668,
+    "por_mes": 0.476,
+    "por_regiao": 0.326
+  },
+  "storage_level": "Disk Memory Deserialized 1x Replicated"
+}

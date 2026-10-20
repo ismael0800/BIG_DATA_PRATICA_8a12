@@ -1,0 +1,20 @@
+# Ambientes virtuais e pacotes
+.venv/
+venv/
+env/
+**/pyspark/Lib/
+**/pyspark/Scripts/
+**/pyspark/Include/
+**/pyspark/pyvenv.cfg
+
+# Cache do Python
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+
+# Arquivos temporarios e do SO
+.DS_Store
+Thumbs.db
+*.tmp
+*.log
