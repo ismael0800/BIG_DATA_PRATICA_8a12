@@ -1,6 +1,8 @@
--- TODO 2: substitua este modelo simples pelo mart do caderno.
 select
-    cast(order_date as date) as order_date,
-    count(*) as total_pedidos
+    order_date,
+    count(order_id) as total_pedidos,
+    round(sum(total), 2) as receita_total,
+    round(avg(total), 2) as ticket_medio
 from {{ ref('stg_orders') }}
-group by 1
+where status = 'paid'
+group by order_date

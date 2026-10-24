@@ -18,3 +18,9 @@ __pycache__/
 Thumbs.db
 *.tmp
 *.log
+
+# dbt
+**/target/
+**/dbt_packages/
+**/.user.yml
+
